@@ -1,10 +1,10 @@
-import React, {useState} from 'react';
+import React from 'react';
 import './Player.scss';
 
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faPlay, faPause, faAngleLeft, faAngleRight} from '@fortawesome/free-solid-svg-icons';
 
-const Player = ({songInfo, setSongInfo, audioRef, currentSong, isPlaying, setIsPlaying}) => {
+const Player = ({songInfo, setSongInfo, audioRef, currentSong, isPlaying, setIsPlaying, songs, setCurrentSong}) => {
 
     const playSongHandler = () => {
         isPlaying ? audioRef.current.pause() : audioRef.current.play();
@@ -20,7 +20,16 @@ const Player = ({songInfo, setSongInfo, audioRef, currentSong, isPlaying, setIsP
     const dragHandler = (e) => {
         audioRef.current.currentTime = e.target.value;
         setSongInfo({...songInfo, currentTime: e.target.value});
-    }
+    };
+
+    const skipTrackHandler = direction => {
+		let currentIndex = songs.findIndex(song => song.id === currentSong.id);
+		if (direction === 'skip-forward') {
+			setCurrentSong(songs[currentIndex + 1] || songs[0]);
+		} else if (direction === 'skip-back') {
+			setCurrentSong(songs[currentIndex - 1] || songs[songs.length -1]);
+		}
+	};
 
     return (
         <div className='player'>
@@ -28,28 +37,33 @@ const Player = ({songInfo, setSongInfo, audioRef, currentSong, isPlaying, setIsP
                 <p>{getTime(songInfo.currentTime)}</p>
                 <input 
                 min={0} 
-                max={songInfo.duration} 
+                max={songInfo.duration || 0} 
                 value={songInfo.currentTime} 
                 onChange={dragHandler}
                 type='range'/>
-                <p>{getTime(songInfo.duration)}</p>
+                <p>{getTime(songInfo.duration || 0)}</p>
             </div>
             <div className='play-control'>
                 <FontAwesomeIcon 
                 className='back' 
                 size='2x' 
-                icon={faAngleLeft} />
+                icon={faAngleLeft}
+                onClick={()=> skipTrackHandler('skip-back')}
+                />
 
                 <FontAwesomeIcon 
                 onClick={playSongHandler} 
                 className='play' 
                 size='2x' 
-                icon={isPlaying? faPause : faPlay} />
+                icon={isPlaying? faPause : faPlay}
+                />
 
                 <FontAwesomeIcon 
                 className='forward' 
                 size='2x' 
-                icon={faAngleRight} />
+                icon={faAngleRight}
+                onClick={()=> skipTrackHandler('skip-forward')}
+                />
             </div>
         </div>
     )

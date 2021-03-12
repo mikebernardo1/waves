@@ -4,6 +4,7 @@
     left: 0;
     width: 20rem;
     height: 100%;
+    background: rgb(255, 255, 255);
     box-shadow: 2px 2px 50px rgb(200, 200, 200);
     overflow: scroll;
     transform: translateX(-100%);
@@ -17,4 +18,10 @@ h2{
 .active-library{
     transform: translateX(0%);
     opacity: 1;
+}
+
+@media screen and (max-width:768px){
+    .library{
+        width:100%;
+    }
 }

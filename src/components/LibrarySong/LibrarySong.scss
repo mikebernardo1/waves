@@ -3,6 +3,7 @@
     align-items: center;
     padding: 1rem 2rem;
     cursor: pointer;
+    transition: background 0.4s ease;
     img{
         width: 50%;
     }
@@ -44,4 +45,10 @@
 
 .selected{
     background: rgb(248, 204, 248);
+}
+
+@media screen and (max-width:768px){
+    .library-song{
+        width:100%;
+    }
 }

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import './Player.scss';
 
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
@@ -22,25 +22,47 @@ const Player = ({songInfo, setSongInfo, audioRef, currentSong, isPlaying, setIsP
         setSongInfo({...songInfo, currentTime: e.target.value});
     };
 
-    const skipTrackHandler = direction => {
+    const skipTrackHandler = async direction => {
 		let currentIndex = songs.findIndex(song => song.id === currentSong.id);
 		if (direction === 'skip-forward') {
-			setCurrentSong(songs[currentIndex + 1] || songs[0]);
+			await setCurrentSong(songs[currentIndex + 1] || songs[0]);
 		} else if (direction === 'skip-back') {
-			setCurrentSong(songs[currentIndex - 1] || songs[songs.length -1]);
+			await setCurrentSong(songs[currentIndex - 1] || songs[songs.length -1]);
 		}
 	};
+
+    useEffect(() => {
+        if (isPlaying) {
+          const playPromise = audioRef.current.play();
+          if (playPromise !== undefined) {
+            playPromise.then((audio) => {
+              audioRef.current.play();
+            });
+          }
+        }
+      }, [currentSong, audioRef, isPlaying]);
+
+    const trackAnim ={
+        transform: `translateX(${songInfo.animationPercentage}%)`
+    }
 
     return (
         <div className='player'>
             <div className='time-control'>
                 <p>{getTime(songInfo.currentTime)}</p>
-                <input 
-                min={0} 
-                max={songInfo.duration || 0} 
-                value={songInfo.currentTime} 
-                onChange={dragHandler}
-                type='range'/>
+                <div style={{
+                    background:`linear-gradient(to right, 
+                    ${currentSong.color[0]}, 
+                    ${currentSong.color[1]})`}} 
+                    className="track">
+                    <input 
+                    min={0} 
+                    max={songInfo.duration || 0} 
+                    value={songInfo.currentTime} 
+                    onChange={dragHandler}
+                    type='range'/>
+                    <div style={trackAnim} className="animate-track"></div>
+                </div>
                 <p>{getTime(songInfo.duration || 0)}</p>
             </div>
             <div className='play-control'>
